@@ -1,0 +1,41 @@
+nohup: ignoring input
+============================================================
+ZANICK Executive Intelligence System - Server Starting
+============================================================
+Server will be available at: http://localhost:8080
+Dashboard URL: http://localhost:8080/
+Health Check: http://localhost:8080/health
+============================================================
+Press Ctrl+C to stop the server
+============================================================
+======== Running on http://0.0.0.0:8080 ========
+(Press CTRL+C to quit)
+Client connected: H9PrGC0ACmQs_81qAAAB
+Fetched 5 articles from US Politics source
+Failed to fetch US Politics: HTTP 404
+Fetched 5 articles from Economics source
+Fetched 5 articles from Finance source
+Fetched 5 articles from Economics source
+Fetched 5 articles from Cryptocurrency source
+Fetched 5 articles from Cryptocurrency source
+Successfully aggregated 15 news articles
+Fetching data for 1 active clients...
+Fetched 5 articles from US Politics source
+Failed to fetch US Politics: HTTP 404
+Fetched 5 articles from Economics source
+Fetched 5 articles from Finance source
+Fetched 5 articles from Economics source
+Fetched 5 articles from Cryptocurrency source
+Fetched 5 articles from Cryptocurrency source
+Successfully aggregated 15 news articles
+Data broadcast complete at 10:44:20
+Client connected: 6N6ymmcq0W69P65gAAAD
+Error fetching XRP data: 'prices'
+Fetched 5 articles from US Politics source
+Failed to fetch US Politics: HTTP 404
+Fetched 5 articles from Economics source
+Fetched 5 articles from Finance source
+Fetched 5 articles from Economics source
+Fetched 5 articles from Cryptocurrency source
+Fetched 5 articles from Cryptocurrency source
+Successfully aggregated 15 news articles

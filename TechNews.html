@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech News - IRIS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: #f5f1eb;
+            padding: 20px;
+            min-height: 100vh;
+            color: #2d2d2d;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 32px;
+            padding: 32px 40px;
+            background: #ffffff;
+            border: 1px solid #e0d8cc;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .page-title {
+            font-family: 'Crimson Pro', serif;
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875em;
+            color: #ae5630;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f5f1eb;
+            border: 1px solid #e0d8cc;
+            border-radius: 8px;
+            color: #ae5630;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0d8cc;
+        }
+
+        .system-status {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b6b6b;
+        }
+
+        .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+
+        .news-container {
+            background: #ffffff;
+            border: 1px solid #e0d8cc;
+            border-radius: 12px;
+            padding: 32px 40px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .news-container h2 {
+            font-family: 'Crimson Pro', serif;
+            color: #ae5630;
+            margin-bottom: 24px;
+            font-size: 1.6em;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .loading {
+            text-align: center;
+            color: #ae5630;
+            padding: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+        }
+
+        .error {
+            color: #c94a2a;
+            padding: 12px;
+            background: #fef5f2;
+            border: 1px solid #f0d4cc;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .news-feed {
+            margin-top: 20px;
+        }
+
+        .news-item {
+            background: #faf8f5;
+            border-left: 3px solid #ae5630;
+            padding: 18px 20px;
+            margin: 12px 0;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .news-item:hover {
+            background: #f5f1eb;
+        }
+
+        .news-item a {
+            color: #2d2d2d;
+            text-decoration: none;
+            display: block;
+        }
+
+        .news-item a:hover .news-title {
+            color: #ae5630;
+        }
+
+        .news-title {
+            font-size: 1.05em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-family: 'Crimson Pro', serif;
+            transition: color 0.2s ease;
+        }
+
+        .news-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.85em;
+            color: #6b6b6b;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .news-source {
+            font-weight: 600;
+            color: #ae5630;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .news-date {
+            color: #999;
+        }
+
+        .news-description {
+            font-size: 0.9em;
+            color: #6b6b6b;
+            line-height: 1.6;
+            margin-top: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .news-category {
+            display: inline-block;
+            background: #f0e8dd;
+            color: #ae5630;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
+        .refresh-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffffff;
+            border: 1px solid #e0d8cc;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 1.4em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            color: #ae5630;
+        }
+
+        .refresh-button:hover {
+            transform: rotate(90deg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #ae5630;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #6b6b6b;
+            margin-top: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 24px 28px;
+            }
+
+            .page-title {
+                font-size: 2em;
+            }
+
+            .news-container {
+                padding: 24px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="page-subtitle">I.R.I.S. | Intelligent Reasoning and Interface System</div>
+            <div class="page-title">Tech News</div>
+            <a href="/" class="nav-link">← Back to Dashboard</a>
+            <div class="status-bar">
+                <div class="system-status">
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>All Systems Online</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator"></div>
+                        <span>Data Sync Active</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="news-container">
+            <h2>🚀 Technology News Feed</h2>
+            <div id="techNewsContent">
+                <div class="loading">Loading technology news...</div>
+            </div>
+        </div>
+
+        <div class="last-updated" id="lastUpdated"></div>
+    </div>
+
+    <button class="refresh-button" onclick="requestRefresh()" title="Refresh Data">&#8635;</button>
+
+    <!-- Socket.IO Client Library -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    <script>
+        // WebSocket connection
+        let socket = null;
+        let connectionStatus = 'disconnected';
+
+        // Initialize WebSocket connection
+        function initializeWebSocket() {
+            const socketUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:8080'
+                : window.location.origin;
+
+            socket = io(socketUrl, {
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionAttempts: Infinity
+            });
+
+            socket.on('connect', () => {
+                console.log('WebSocket Connected to IRIS Backend');
+                connectionStatus = 'connected';
+                updateConnectionStatus();
+                // Request tech news data on connect
+                socket.emit('request_tech_news');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket Disconnected');
+                connectionStatus = 'disconnected';
+                updateConnectionStatus();
+            });
+
+            socket.on('tech_news_update', (data) => {
+                console.log('Received tech news update from server');
+                displayTechNews(data);
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('WebSocket connection error:', error);
+                connectionStatus = 'error';
+                updateConnectionStatus();
+            });
+        }
+
+        function updateConnectionStatus() {
+            const statusItems = document.querySelectorAll('.status-item');
+            if (statusItems.length > 1) {
+                const dataSyncItem = statusItems[1];
+                const indicator = dataSyncItem.querySelector('.status-indicator');
+                const text = dataSyncItem.querySelector('span');
+
+                if (connectionStatus === 'connected') {
+                    indicator.style.background = '#22c55e';
+                    text.textContent = 'Live Data Stream Active';
+                } else if (connectionStatus === 'error') {
+                    indicator.style.background = '#c94a2a';
+                    text.textContent = 'Connection Error';
+                } else {
+                    indicator.style.background = '#d4a574';
+                    text.textContent = 'Connecting...';
+                }
+            }
+        }
+
+        // Display tech news data
+        function displayTechNews(newsData) {
+            const container = document.getElementById('techNewsContent');
+
+            if (!newsData || newsData.length === 0) {
+                container.innerHTML = '<div class="loading">No tech news articles available</div>';
+                return;
+            }
+
+            let html = '<div class="news-feed">';
+
+            newsData.forEach(article => {
+                const publishedDate = new Date(article.publishedAt);
+                const timeAgo = getTimeAgo(publishedDate);
+
+                html += `
+                    <div class="news-item">
+                        <a href="${article.url}" target="_blank" rel="noopener noreferrer">
+                            <span class="news-source">${article.source}</span>
+                            <div class="news-title">${article.title}</div>
+                            <div class="news-meta">
+                                ${article.category ? `<span class="news-category">${article.category}</span>` : ''}
+                                <span class="news-date">${timeAgo}</span>
+                            </div>
+                            ${article.description ? `<div class="news-description">${article.description}</div>` : ''}
+                        </a>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Update last updated time
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent =
+                `SYSTEM STATUS: Data synchronized at ${now.toLocaleTimeString('en-US')}`;
+        }
+
+        // Helper function to calculate time ago
+        function getTimeAgo(date) {
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // Request manual refresh from server
+        function requestRefresh() {
+            if (socket && socket.connected) {
+                socket.emit('request_tech_news_refresh');
+                console.log('Tech news refresh requested');
+            } else {
+                console.warn('WebSocket not connected, cannot refresh');
+            }
+        }
+
+        // Initialize
+        console.log('IRIS Tech News Page Initialized');
+        initializeWebSocket();
+    </script>
+</body>
+</html>

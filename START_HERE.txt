@@ -1,0 +1,112 @@
+================================================================================
+                  IRIS - START HERE
+================================================================================
+
+Welcome to your IRIS Intelligent Reasoning and Interface System!
+
+This dashboard provides real-time updates on:
+  ✓ XRP Cryptocurrency prices
+  ✓ Weather for Irving & Lewisville, TX
+  ✓ News: US Politics, Economics, Finance, Cryptocurrency
+
+================================================================================
+                  GETTING STARTED (3 SIMPLE STEPS)
+================================================================================
+
+1. Open Terminal
+
+2. Navigate to project and start server:
+
+   cd /home/zanick/JarvisProject
+   ./start_iris.sh
+
+3. Open your web browser to:
+
+   http://localhost:8080
+
+That's it! Your dashboard is now running.
+
+================================================================================
+                  FIRST TIME SETUP
+================================================================================
+
+If you see "ModuleNotFoundError", install dependencies first:
+
+  pip3 install --user aiohttp python-socketio
+
+Then run the startup script again.
+
+================================================================================
+                  USING YOUR DASHBOARD
+================================================================================
+
+• The dashboard updates automatically every 5 minutes
+• Click any news headline to read the full article
+• The "Refresh" button manually updates all data
+• Connection status shown in top-right corner
+• Personalized greeting based on time of day
+
+================================================================================
+                  RUNNING IN BACKGROUND
+================================================================================
+
+To keep the server running even after closing terminal:
+
+  cd /home/zanick/JarvisProject
+  nohup python3 dashboard_server.py > iris.log 2>&1 &
+
+To stop the background server:
+
+  pkill -f dashboard_server.py
+
+================================================================================
+                  ACCESSING FROM OTHER DEVICES
+================================================================================
+
+To access from your phone, tablet, or other computers:
+
+1. Find your computer's IP address:
+   hostname -I
+
+2. On other device, open browser to:
+   http://YOUR_IP_ADDRESS:8080
+
+================================================================================
+                  NEED HELP?
+================================================================================
+
+• Quick reference: See QUICKSTART.md
+• Full documentation: See README.md
+• Project info: See PROJECT_INFO.txt
+• Version history: See CHANGELOG.md
+
+================================================================================
+                  TROUBLESHOOTING
+================================================================================
+
+Q: Dashboard shows "Connecting..." forever
+A: Check if server is running: curl http://localhost:8080/health
+
+Q: Port 8080 already in use
+A: Stop existing server: pkill -f dashboard_server.py
+
+Q: News feed is empty
+A: Wait 1-2 minutes for first data fetch, then refresh
+
+Q: How do I stop the server?
+A: Press Ctrl+C in the terminal where it's running
+   OR: pkill -f dashboard_server.py
+
+================================================================================
+
+Enjoy your IRIS dashboard!
+
+Built specifically for you with:
+  • Python + WebSocket technology
+  • Real-time data streaming
+  • Futuristic dark theme
+  • Personalized experience
+
+Questions? Check the README.md for detailed documentation.
+
+================================================================================

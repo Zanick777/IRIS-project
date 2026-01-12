@@ -1,0 +1,170 @@
+================================================================================
+    IRIS EXECUTIVE INTELLIGENCE SYSTEM - PROJECT INFORMATION
+================================================================================
+
+Project Name: IRIS - Intelligent Reasoning and Interface System
+Version: 4.0
+Location: /home/zanick/JarvisProject/
+Created: January 2026
+Purpose: Personal executive dashboard with real-time intelligence
+
+================================================================================
+    QUICK START
+================================================================================
+
+1. Navigate to project:
+   cd /home/zanick/JarvisProject
+
+2. Start the server:
+   ./start_iris.sh
+
+3. Access dashboard:
+   Open browser to http://localhost:8080
+
+================================================================================
+    PROJECT FILES
+================================================================================
+
+Core Files:
+  dashboard_server.py    - Python backend server with WebSocket support
+  dashboard.html         - Frontend dashboard interface
+  requirements.txt       - Python package dependencies
+  start_iris.sh        - Easy startup script (executable)
+
+Documentation:
+  README.md              - Complete documentation and setup guide
+  QUICKSTART.md          - Quick reference guide
+  CHANGELOG.md           - Version history and updates
+  PROJECT_INFO.txt       - This file
+
+================================================================================
+    FEATURES
+================================================================================
+
+✓ Real-time XRP cryptocurrency tracking with 7-day history
+✓ Weather forecasts for Irving, TX and Lewisville, TX
+✓ Intelligence news feed covering:
+  - US Politics
+  - Economics
+  - Finance
+  - Cryptocurrency
+✓ Personalized greeting: "Good Morning/Afternoon/Evening, Zack"
+✓ Live WebSocket updates every 5 minutes
+✓ Dark futuristic theme with cyan/neon green accents
+✓ Clickable news articles opening in new tabs
+
+================================================================================
+    DEPENDENCIES
+================================================================================
+
+Python 3.8+
+aiohttp>=3.13.0
+python-socketio>=5.16.0
+
+Install with:
+  pip3 install --user aiohttp python-socketio
+
+================================================================================
+    RUNNING AS BACKGROUND SERVICE
+================================================================================
+
+Option 1 - nohup:
+  cd /home/zanick/JarvisProject
+  nohup python3 dashboard_server.py > iris.log 2>&1 &
+
+Option 2 - screen:
+  cd /home/zanick/JarvisProject
+  screen -dmS iris python3 dashboard_server.py
+
+Option 3 - tmux:
+  cd /home/zanick/JarvisProject
+  tmux new-session -d -s iris 'python3 dashboard_server.py'
+
+To stop:
+  pkill -f dashboard_server.py
+
+================================================================================
+    ACCESSING FROM OTHER DEVICES
+================================================================================
+
+The server listens on 0.0.0.0:8080, accessible from other devices:
+
+1. Find your machine's IP:
+   hostname -I
+
+2. Access from other devices:
+   http://YOUR_IP_ADDRESS:8080
+
+================================================================================
+    TROUBLESHOOTING
+================================================================================
+
+Server won't start:
+  - Check if port 8080 is already in use: lsof -i :8080
+  - Kill existing process: pkill -f dashboard_server.py
+
+Dependencies missing:
+  - Install manually: pip3 install --user aiohttp python-socketio
+
+Dashboard shows "Connecting...":
+  - Check server is running: curl http://localhost:8080/health
+  - Check server logs for errors
+
+News feed empty:
+  - Wait a few minutes for first fetch
+  - Check internet connection
+  - Server fetches from 7 RSS sources
+
+================================================================================
+    CUSTOMIZATION
+================================================================================
+
+Update frequency:
+  Edit dashboard_server.py, line ~290
+  Change: await asyncio.sleep(300)  # 300 = 5 minutes
+
+Server port:
+  Edit dashboard_server.py, last line
+  Change: web.run_app(app, host='0.0.0.0', port=8080)
+
+Weather locations:
+  Edit dashboard_server.py, fetch_all_data() method
+  Update latitude/longitude coordinates
+
+News categories:
+  Edit dashboard_server.py, fetch_news_data() method
+  Modify news_sources list with different RSS feeds
+
+================================================================================
+    TECHNICAL DETAILS
+================================================================================
+
+Architecture:
+  - Backend: Python with aiohttp + Socket.IO
+  - Frontend: HTML5/CSS3/JavaScript with Socket.IO client
+  - Communication: WebSocket for real-time bidirectional updates
+  - Data sources: CoinGecko, Open-Meteo, RSS feeds
+
+APIs Used (all free, no keys required):
+  - CoinGecko API: Cryptocurrency data
+  - Open-Meteo API: Weather forecasts
+  - Direct RSS feeds: News aggregation
+
+Update Cycle:
+  1. Server fetches data every 5 minutes
+  2. WebSocket broadcasts updates to all connected clients
+  3. Frontend automatically updates display
+  4. Manual refresh button available
+
+================================================================================
+    SUPPORT
+================================================================================
+
+For issues or questions:
+  - Check README.md for detailed documentation
+  - Check QUICKSTART.md for quick reference
+  - Check CHANGELOG.md for version history
+
+================================================================================
+
+Created for Zack - 29-year-old executive passionate about technology and automation
