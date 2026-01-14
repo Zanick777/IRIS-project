@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  iris:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iris-dashboard
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      # User personalization
+      - USER_NAME=${USER_NAME:-User}
+      - PRIMARY_CITY=${PRIMARY_CITY:-Irving}
+      - PRIMARY_LATITUDE=${PRIMARY_LATITUDE:-32.8140}
+      - PRIMARY_LONGITUDE=${PRIMARY_LONGITUDE:--96.9489}
+      - SECONDARY_CITY=${SECONDARY_CITY:-Lewisville}
+      - SECONDARY_LATITUDE=${SECONDARY_LATITUDE:-33.0462}
+      - SECONDARY_LONGITUDE=${SECONDARY_LONGITUDE:--96.9942}
+
+      # Server configuration
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - UPDATE_INTERVAL=${UPDATE_INTERVAL:-300}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - iris-network
+
+networks:
+  iris-network:
+    driver: bridge

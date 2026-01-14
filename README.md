@@ -107,7 +107,23 @@ NEWS_API_KEY=your_key_here
 
 ## Installation
 
-### Prerequisites
+### Container Deployment (Recommended)
+
+IRIS can now run in Docker or Podman containers for maximum portability and ease of deployment!
+
+**Quick Start:**
+```bash
+cp .env.example .env  # Configure your settings
+podman-compose up -d  # Start with Podman
+# or
+docker-compose up -d  # Start with Docker
+```
+
+📖 **[Complete Container Setup Guide](docs/container_setup.md)** - Comprehensive documentation for Docker and Podman deployment
+
+### Native Python Installation
+
+#### Prerequisites
 - Python 3.8 or higher
 - pip (Python package installer)
 - Modern web browser (Chrome, Firefox, Edge, Safari)
