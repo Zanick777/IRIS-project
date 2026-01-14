@@ -581,7 +581,7 @@ async def cleanup_background_tasks(app):
 routes = web.RouteTableDef()
 
 @routes.get('/')
-async def index(request):
+async def index(_request):
     """Serve the dashboard HTML"""
     try:
         # Resolve the dashboard file relative to this script's directory
@@ -605,7 +605,7 @@ async def index(request):
         return web.Response(text='Internal server error', status=500)
 
 @routes.get('/tech-news')
-async def tech_news_page(request):
+async def tech_news_page(_request):
     """Serve the tech news page"""
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -626,7 +626,7 @@ async def tech_news_page(request):
         return web.Response(text='Internal server error', status=500)
 
 @routes.get('/config')
-async def config(request):
+async def config(_request):
     """Provide client configuration"""
     return web.json_response({
         'userName': USER_NAME,
@@ -635,7 +635,7 @@ async def config(request):
     })
 
 @routes.get('/health')
-async def health(request):
+async def health(_request):
     """Health check endpoint"""
     return web.json_response({
         'status': 'online',
