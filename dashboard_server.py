@@ -12,7 +12,10 @@ import aiohttp
 from aiohttp import web
 import socketio
 import os
+import re
+from html import unescape
 from pathlib import Path
+from email.utils import parsedate_to_datetime
 
 # Load environment variables from .env file if it exists
 try:
@@ -232,8 +235,6 @@ class DashboardDataService:
 
     def _get_source_name_from_url(self, url: str) -> str:
         """Extract a clean source name from URL"""
-        import re
-
         # Common source mappings
         source_map = {
             'techcrunch.com': 'TechCrunch',
@@ -267,9 +268,6 @@ class DashboardDataService:
 
     def _parse_rss_feed(self, rss_text: str, category: str) -> List[Dict]:
         """Parse RSS feed XML and extract article information"""
-        import re
-        from html import unescape
-
         articles = []
 
         # Simple regex-based RSS parsing (avoiding external XML libraries)
@@ -327,9 +325,8 @@ class DashboardDataService:
 
                     if pub_date_str:
                         try:
-                            from email.utils import parsedate_to_datetime
                             pub_date = parsedate_to_datetime(pub_date_str).isoformat()
-                        except:
+                        except Exception:
                             try:
                                 # Try ISO format
                                 from dateutil import parser
