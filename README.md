@@ -121,6 +121,8 @@ docker-compose up -d  # Start with Docker
 
 📖 **[Complete Container Setup Guide](docs/container_setup.md)** - Comprehensive documentation for Docker and Podman deployment
 
+🛠️ **Troubleshooting:** [docs/troubleshooting.md](docs/troubleshooting.md) - Consolidated troubleshooting steps for local and container workflows
+
 ### Native Python Installation
 
 #### Prerequisites
