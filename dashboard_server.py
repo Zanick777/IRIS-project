@@ -80,12 +80,19 @@ class DashboardDataService:
         """
         try:
             # Fetch current price data
-            current_url = 'https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=usd&include_24hr_change=true&include_market_cap=true'
+            current_url = (
+                'https://api.coingecko.com/api/v3/simple/price'
+                '?ids=ripple&vs_currencies=usd'
+                '&include_24hr_change=true&include_market_cap=true'
+            )
             async with self.session.get(current_url) as response:
                 current_data = await response.json()
 
             # Fetch 7-day historical data
-            historical_url = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=7'
+            historical_url = (
+                'https://api.coingecko.com/api/v3/coins/ripple/market_chart'
+                '?vs_currency=usd&days=7'
+            )
             async with self.session.get(historical_url) as response:
                 historical_data = await response.json()
 
@@ -138,7 +145,8 @@ class DashboardDataService:
             url = (
                 f'https://api.open-meteo.com/v1/forecast?'
                 f'latitude={latitude}&longitude={longitude}&'
-                f'current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&'
+                f'current=temperature_2m,relative_humidity_2m,apparent_temperature,'
+                f'precipitation,weather_code,wind_speed_10m&'
                 f'daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&'
                 f'temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&'
                 f'timezone=America/Chicago&forecast_days=7'
@@ -162,7 +170,10 @@ class DashboardDataService:
             return self.weather_cache.get(city)
 
     async def fetch_news_data(self) -> List[Dict]:
-        """Fetch news from multiple RSS feeds with focus on US politics, economics, finance, and crypto"""
+        """Fetch news from multiple RSS feeds.
+
+        Focus on US politics, economics, finance, and crypto.
+        """
         try:
             news_articles = []
 
@@ -175,7 +186,8 @@ class DashboardDataService:
                 # Economics & Finance
                 ('Economics', 'https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml'),  # WSJ Business
                 ('Finance', 'https://feeds.bloomberg.com/markets/news.rss'),  # Bloomberg Markets
-                ('Economics', 'https://www.cnbc.com/id/100003114/device/rss/rss.html'),  # CNBC Economy
+                # CNBC Economy
+                ('Economics', 'https://www.cnbc.com/id/100003114/device/rss/rss.html'),
 
                 # Cryptocurrency
                 ('Cryptocurrency', 'https://cointelegraph.com/rss'),  # Cointelegraph
@@ -293,9 +305,11 @@ class DashboardDataService:
                     pub_date_match = re.search(r'<dc:date>(.*?)</dc:date>', item)
 
                 # Try different description formats
-                description_match = re.search(r'<description><!\[CDATA\[(.*?)\]\]></description>', item, re.DOTALL)
+                desc_cdata = r'<description><!\[CDATA\[(.*?)\]\]></description>'
+                description_match = re.search(desc_cdata, item, re.DOTALL)
                 if not description_match:
-                    description_match = re.search(r'<description>(.*?)</description>', item, re.DOTALL)
+                    desc_pattern = r'<description>(.*?)</description>'
+                    description_match = re.search(desc_pattern, item, re.DOTALL)
                 if not description_match:
                     description_match = re.search(r'<summary>(.*?)</summary>', item, re.DOTALL)
                 if not description_match:
@@ -367,7 +381,10 @@ class DashboardDataService:
         return articles
 
     async def fetch_tech_news_data(self) -> List[Dict]:
-        """Fetch technology news from multiple RSS feeds focused on AI, tech companies, and industry trends"""
+        """Fetch technology news from multiple RSS feeds.
+
+        Focused on AI, tech companies, and industry trends.
+        """
         try:
             tech_articles = []
 
@@ -438,8 +455,12 @@ class DashboardDataService:
         try:
             # Fetch all data in parallel
             xrp_task = self.fetch_xrp_data(force=force)
-            primary_task = self.fetch_weather_data(PRIMARY_LATITUDE, PRIMARY_LONGITUDE, PRIMARY_CITY)
-            secondary_task = self.fetch_weather_data(SECONDARY_LATITUDE, SECONDARY_LONGITUDE, SECONDARY_CITY)
+            primary_task = self.fetch_weather_data(
+                PRIMARY_LATITUDE, PRIMARY_LONGITUDE, PRIMARY_CITY
+            )
+            secondary_task = self.fetch_weather_data(
+                SECONDARY_LATITUDE, SECONDARY_LONGITUDE, SECONDARY_CITY
+            )
             news_task = self.fetch_news_data()
 
             xrp_data, primary_weather, secondary_weather, news_data = await asyncio.gather(
@@ -449,8 +470,9 @@ class DashboardDataService:
             return {
                 'xrp': xrp_data,
                 'weather': {
-                    'irving': primary_weather,  # Keep key as 'irving' for frontend compatibility
-                    'lewisville': secondary_weather  # Keep key as 'lewisville' for frontend compatibility
+                    # Keep keys for frontend compatibility
+                    'irving': primary_weather,
+                    'lewisville': secondary_weather
                 },
                 'news': news_data,
                 'timestamp': datetime.now().isoformat()
