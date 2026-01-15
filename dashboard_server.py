@@ -73,7 +73,7 @@ class DashboardDataService:
         if self.session:
             await self.session.close()
 
-    async def fetch_xrp_data(self, _force: bool = False) -> Dict:
+    async def fetch_xrp_data(self, force: bool = False) -> Dict:  # pylint: disable=unused-argument
         """Fetch XRP cryptocurrency data from CoinGecko API
 
         The `force` flag is accepted but currently acts as a placeholder
