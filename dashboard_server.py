@@ -74,7 +74,7 @@ class DashboardDataService:
         if self.session:
             await self.session.close()
 
-    async def fetch_xrp_data(self, force: bool = False) -> Dict:
+    async def fetch_xrp_data(self, _force: bool = False) -> Dict:
         """Fetch XRP cryptocurrency data from CoinGecko API
 
         The `force` flag is accepted but currently acts as a placeholder
@@ -168,7 +168,7 @@ class DashboardDataService:
             self.weather_cache[city] = result
             return result
 
-        except Exception as e:
+        except (aiohttp.ClientError, KeyError) as e:
             print(f"Error fetching weather data for {city}: {e}")
             return self.weather_cache.get(city)
 
