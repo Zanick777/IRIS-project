@@ -5,18 +5,20 @@ Provides real-time data updates for the dashboard via WebSocket
 """
 
 import asyncio
-import json
-from datetime import datetime, timedelta
+import os
+import re
+from datetime import datetime
+from email.utils import parsedate_to_datetime
+from html import unescape
+from pathlib import Path
 from typing import Dict, List
+from dotenv import load_dotenv
 import aiohttp
 from aiohttp import web
 import socketio
-import os
-from pathlib import Path
 
 # Load environment variables from .env file if it exists
 try:
-    from dotenv import load_dotenv
     env_path = Path(__file__).parent / '.env'
     load_dotenv(dotenv_path=env_path)
     print("Loaded environment variables from .env file")
@@ -71,7 +73,7 @@ class DashboardDataService:
         if self.session:
             await self.session.close()
 
-    async def fetch_xrp_data(self, force: bool = False) -> Dict:
+    async def fetch_xrp_data(self, force: bool = False) -> Dict:  # pylint: disable=unused-argument
         """Fetch XRP cryptocurrency data from CoinGecko API
 
         The `force` flag is accepted but currently acts as a placeholder
@@ -80,12 +82,19 @@ class DashboardDataService:
         """
         try:
             # Fetch current price data
-            current_url = 'https://api.coingecko.com/api/v3/simple/price?ids=ripple&vs_currencies=usd&include_24hr_change=true&include_market_cap=true'
+            current_url = (
+                'https://api.coingecko.com/api/v3/simple/price'
+                '?ids=ripple&vs_currencies=usd'
+                '&include_24hr_change=true&include_market_cap=true'
+            )
             async with self.session.get(current_url) as response:
                 current_data = await response.json()
 
             # Fetch 7-day historical data
-            historical_url = 'https://api.coingecko.com/api/v3/coins/ripple/market_chart?vs_currency=usd&days=7'
+            historical_url = (
+                'https://api.coingecko.com/api/v3/coins/ripple/market_chart'
+                '?vs_currency=usd&days=7'
+            )
             async with self.session.get(historical_url) as response:
                 historical_data = await response.json()
 
@@ -138,7 +147,8 @@ class DashboardDataService:
             url = (
                 f'https://api.open-meteo.com/v1/forecast?'
                 f'latitude={latitude}&longitude={longitude}&'
-                f'current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&'
+                f'current=temperature_2m,relative_humidity_2m,apparent_temperature,'
+                f'precipitation,weather_code,wind_speed_10m&'
                 f'daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&'
                 f'temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&'
                 f'timezone=America/Chicago&forecast_days=7'
@@ -157,12 +167,15 @@ class DashboardDataService:
             self.weather_cache[city] = result
             return result
 
-        except Exception as e:
+        except (aiohttp.ClientError, KeyError) as e:
             print(f"Error fetching weather data for {city}: {e}")
             return self.weather_cache.get(city)
 
     async def fetch_news_data(self) -> List[Dict]:
-        """Fetch news from multiple RSS feeds with focus on US politics, economics, finance, and crypto"""
+        """Fetch news from multiple RSS feeds.
+
+        Focus on US politics, economics, finance, and crypto.
+        """
         try:
             news_articles = []
 
@@ -175,7 +188,8 @@ class DashboardDataService:
                 # Economics & Finance
                 ('Economics', 'https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml'),  # WSJ Business
                 ('Finance', 'https://feeds.bloomberg.com/markets/news.rss'),  # Bloomberg Markets
-                ('Economics', 'https://www.cnbc.com/id/100003114/device/rss/rss.html'),  # CNBC Economy
+                # CNBC Economy
+                ('Economics', 'https://www.cnbc.com/id/100003114/device/rss/rss.html'),
 
                 # Cryptocurrency
                 ('Cryptocurrency', 'https://cointelegraph.com/rss'),  # Cointelegraph
@@ -220,8 +234,6 @@ class DashboardDataService:
 
     def _get_source_name_from_url(self, url: str) -> str:
         """Extract a clean source name from URL"""
-        import re
-
         # Common source mappings
         source_map = {
             'techcrunch.com': 'TechCrunch',
@@ -253,11 +265,8 @@ class DashboardDataService:
 
         return None
 
-    def _parse_rss_feed(self, rss_text: str, category: str) -> List[Dict]:
+    def _parse_rss_feed(self, rss_text: str, category: str) -> List[Dict]:  # pylint: disable=too-many-locals
         """Parse RSS feed XML and extract article information"""
-        import re
-        from html import unescape
-
         articles = []
 
         # Simple regex-based RSS parsing (avoiding external XML libraries)
@@ -293,9 +302,11 @@ class DashboardDataService:
                     pub_date_match = re.search(r'<dc:date>(.*?)</dc:date>', item)
 
                 # Try different description formats
-                description_match = re.search(r'<description><!\[CDATA\[(.*?)\]\]></description>', item, re.DOTALL)
+                desc_cdata = r'<description><!\[CDATA\[(.*?)\]\]></description>'
+                description_match = re.search(desc_cdata, item, re.DOTALL)
                 if not description_match:
-                    description_match = re.search(r'<description>(.*?)</description>', item, re.DOTALL)
+                    desc_pattern = r'<description>(.*?)</description>'
+                    description_match = re.search(desc_pattern, item, re.DOTALL)
                 if not description_match:
                     description_match = re.search(r'<summary>(.*?)</summary>', item, re.DOTALL)
                 if not description_match:
@@ -313,9 +324,8 @@ class DashboardDataService:
 
                     if pub_date_str:
                         try:
-                            from email.utils import parsedate_to_datetime
                             pub_date = parsedate_to_datetime(pub_date_str).isoformat()
-                        except:
+                        except Exception:
                             try:
                                 # Try ISO format
                                 from dateutil import parser
@@ -367,7 +377,10 @@ class DashboardDataService:
         return articles
 
     async def fetch_tech_news_data(self) -> List[Dict]:
-        """Fetch technology news from multiple RSS feeds focused on AI, tech companies, and industry trends"""
+        """Fetch technology news from multiple RSS feeds.
+
+        Focused on AI, tech companies, and industry trends.
+        """
         try:
             tech_articles = []
 
@@ -438,8 +451,12 @@ class DashboardDataService:
         try:
             # Fetch all data in parallel
             xrp_task = self.fetch_xrp_data(force=force)
-            primary_task = self.fetch_weather_data(PRIMARY_LATITUDE, PRIMARY_LONGITUDE, PRIMARY_CITY)
-            secondary_task = self.fetch_weather_data(SECONDARY_LATITUDE, SECONDARY_LONGITUDE, SECONDARY_CITY)
+            primary_task = self.fetch_weather_data(
+                PRIMARY_LATITUDE, PRIMARY_LONGITUDE, PRIMARY_CITY
+            )
+            secondary_task = self.fetch_weather_data(
+                SECONDARY_LATITUDE, SECONDARY_LONGITUDE, SECONDARY_CITY
+            )
             news_task = self.fetch_news_data()
 
             xrp_data, primary_weather, secondary_weather, news_data = await asyncio.gather(
@@ -449,8 +466,9 @@ class DashboardDataService:
             return {
                 'xrp': xrp_data,
                 'weather': {
-                    'irving': primary_weather,  # Keep key as 'irving' for frontend compatibility
-                    'lewisville': secondary_weather  # Keep key as 'lewisville' for frontend compatibility
+                    # Keep keys for frontend compatibility
+                    'irving': primary_weather,
+                    'lewisville': secondary_weather
                 },
                 'news': news_data,
                 'timestamp': datetime.now().isoformat()
@@ -543,15 +561,15 @@ async def periodic_update():
             await asyncio.sleep(60)  # Wait 1 minute before retry on error
 
 
-async def start_background_tasks(app):
+async def start_background_tasks(application):
     """Start background tasks"""
     await data_service.initialize()
-    app['periodic_update_task'] = asyncio.create_task(periodic_update())
+    application['periodic_update_task'] = asyncio.create_task(periodic_update())
 
 
-async def cleanup_background_tasks(app):
+async def cleanup_background_tasks(application):
     """Cleanup background tasks"""
-    app['periodic_update_task'].cancel()
+    application['periodic_update_task'].cancel()
     await data_service.close()
 
 
@@ -559,7 +577,7 @@ async def cleanup_background_tasks(app):
 routes = web.RouteTableDef()
 
 @routes.get('/')
-async def index(request):
+async def index(_request):
     """Serve the dashboard HTML"""
     try:
         # Resolve the dashboard file relative to this script's directory
@@ -578,12 +596,12 @@ async def index(request):
 
         # If none found, return 404 with helpful message
         return web.Response(text='Dashboard HTML file not found', status=404)
-    except Exception as e:
+    except (OSError, IOError) as e:
         print(f'Error serving dashboard HTML: {e}')
         return web.Response(text='Internal server error', status=500)
 
 @routes.get('/tech-news')
-async def tech_news_page(request):
+async def tech_news_page(_request):
     """Serve the tech news page"""
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -599,12 +617,12 @@ async def tech_news_page(request):
                     return web.Response(text=f.read(), content_type='text/html')
 
         return web.Response(text='Tech News page not found', status=404)
-    except Exception as e:
+    except (OSError, IOError) as e:
         print(f'Error serving tech news page: {e}')
         return web.Response(text='Internal server error', status=500)
 
 @routes.get('/config')
-async def config(request):
+async def config(_request):
     """Provide client configuration"""
     return web.json_response({
         'userName': USER_NAME,
@@ -613,7 +631,7 @@ async def config(request):
     })
 
 @routes.get('/health')
-async def health(request):
+async def health(_request):
     """Health check endpoint"""
     return web.json_response({
         'status': 'online',
@@ -632,7 +650,7 @@ if __name__ == '__main__':
     print('=' * 60)
     print('IRIS - Intelligent Reasoning and Interface System - Server Starting')
     print('=' * 60)
-    print(f'Configuration:')
+    print('Configuration:')
     print(f'  User: {USER_NAME}')
     print(f'  Primary Location: {PRIMARY_CITY}')
     print(f'  Secondary Location: {SECONDARY_CITY}')
