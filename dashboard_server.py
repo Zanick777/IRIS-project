@@ -5,21 +5,20 @@ Provides real-time data updates for the dashboard via WebSocket
 """
 
 import asyncio
-import json
-from datetime import datetime, timedelta
+import os
+import re
+from datetime import datetime
+from email.utils import parsedate_to_datetime
+from html import unescape
+from pathlib import Path
 from typing import Dict, List
+from dotenv import load_dotenv
 import aiohttp
 from aiohttp import web
 import socketio
-import os
-import re
-from html import unescape
-from pathlib import Path
-from email.utils import parsedate_to_datetime
 
 # Load environment variables from .env file if it exists
 try:
-    from dotenv import load_dotenv
     env_path = Path(__file__).parent / '.env'
     load_dotenv(dotenv_path=env_path)
     print("Loaded environment variables from .env file")
@@ -562,15 +561,15 @@ async def periodic_update():
             await asyncio.sleep(60)  # Wait 1 minute before retry on error
 
 
-async def start_background_tasks(app):
+async def start_background_tasks(application):
     """Start background tasks"""
     await data_service.initialize()
-    app['periodic_update_task'] = asyncio.create_task(periodic_update())
+    application['periodic_update_task'] = asyncio.create_task(periodic_update())
 
 
-async def cleanup_background_tasks(app):
+async def cleanup_background_tasks(application):
     """Cleanup background tasks"""
-    app['periodic_update_task'].cancel()
+    application['periodic_update_task'].cancel()
     await data_service.close()
 
 
@@ -597,7 +596,7 @@ async def index(_request):
 
         # If none found, return 404 with helpful message
         return web.Response(text='Dashboard HTML file not found', status=404)
-    except Exception as e:
+    except (OSError, IOError) as e:
         print(f'Error serving dashboard HTML: {e}')
         return web.Response(text='Internal server error', status=500)
 
@@ -618,7 +617,7 @@ async def tech_news_page(_request):
                     return web.Response(text=f.read(), content_type='text/html')
 
         return web.Response(text='Tech News page not found', status=404)
-    except Exception as e:
+    except (OSError, IOError) as e:
         print(f'Error serving tech news page: {e}')
         return web.Response(text='Internal server error', status=500)
 
@@ -651,7 +650,7 @@ if __name__ == '__main__':
     print('=' * 60)
     print('IRIS - Intelligent Reasoning and Interface System - Server Starting')
     print('=' * 60)
-    print(f'Configuration:')
+    print('Configuration:')
     print(f'  User: {USER_NAME}')
     print(f'  Primary Location: {PRIMARY_CITY}')
     print(f'  Secondary Location: {SECONDARY_CITY}')
