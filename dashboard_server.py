@@ -265,7 +265,7 @@ class DashboardDataService:
 
         return None
 
-    def _parse_rss_feed(self, rss_text: str, category: str) -> List[Dict]:
+    def _parse_rss_feed(self, rss_text: str, category: str) -> List[Dict]:  # pylint: disable=too-many-locals
         """Parse RSS feed XML and extract article information"""
         articles = []
 
